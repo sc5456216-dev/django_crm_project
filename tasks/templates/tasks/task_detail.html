@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ task.title }} - CRM{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header {% if task.status == 'completed' %}bg-success{% elif task.status == 'pending' %}bg-warning{% else %}bg-info{% endif %} text-white d-flex justify-content-between">
+        <h4 class="mb-0"><i class="fas fa-tasks"></i> {{ task.title }}</h4>
+        <div>
+            <a href="{% url 'task_update' task.pk %}" class="btn btn-light btn-sm"><i class="fas fa-edit"></i> Edit</a>
+            <a href="{% url 'task_list' %}" class="btn btn-light btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Status:</strong> 
+                    {% if task.status == 'completed' %}<span class="badge bg-success">Completed</span>
+                    {% elif task.status == 'pending' %}<span class="badge bg-warning text-dark">Pending</span>
+                    {% else %}<span class="badge bg-info">In Progress</span>{% endif %}
+                </p>
+                <p><strong>Due Date:</strong> {{ task.due_date|date:"Y-m-d H:i" }}</p>
+                <p><strong>Assigned To:</strong> {{ task.assigned_to }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Contact:</strong> {{ task.contact|default:"-" }}</p>
+                <p><strong>Related Deal:</strong> {{ task.deal|default:"-" }}</p>
+                <p><strong>Created:</strong> {{ task.created_at|date:"Y-m-d" }}</p>
+            </div>
+        </div>
+        {% if task.notes %}
+        <hr>
+        <h6>Notes:</h6>
+        <p class="text-muted">{{ task.notes|linebreaks }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

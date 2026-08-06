@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - CRM{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="fas fa-tachometer-alt text-primary"></i> Dashboard</h2>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white shadow-sm">
+            <div class="card-body">
+                <h5><i class="fas fa-users"></i> Contacts</h5>
+                <h2>{{ total_contacts }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white shadow-sm">
+            <div class="card-body">
+                <h5><i class="fas fa-handshake"></i> Total Deals</h5>
+                <h2>{{ total_deals }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white shadow-sm">
+            <div class="card-body">
+                <h5><i class="fas fa-trophy"></i> Won Deals</h5>
+                <h2>{{ won_deals }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark shadow-sm">
+            <div class="card-body">
+                <h5><i class="fas fa-tasks"></i> Pending Tasks</h5>
+                <h2>{{ pending_tasks }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Deals by Stage</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="dealsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Contact Status</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="contactsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Revenue Chart -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-rupee-sign"></i> Total Revenue: Rs. {{ total_revenue }}</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Contacts -->
+<div class="card shadow-sm">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0"><i class="fas fa-clock"></i> Recently Added Contacts</h5>
+    </div>
+    <div class="list-group list-group-flush">
+        {% for contact in recent_contacts %}
+            <a href="{% url 'contact_detail' contact.pk %}" class="list-group-item list-group-item-action">
+                <div class="d-flex justify-content-between">
+                    <span><i class="fas fa-user text-primary"></i> {{ contact.full_name }}</span>
+                    <small class="text-muted">{{ contact.created_at|date:"Y-m-d" }}</small>
+                </div>
+            </a>
+        {% empty %}
+            <div class="list-group-item text-muted text-center py-3">No contacts found</div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Deals by Stage Bar Chart
+    const dealsCtx = document.getElementById('dealsChart').getContext('2d');
+    new Chart(dealsCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ deals_by_stage.keys|safe }},
+            datasets: [{
+                label: 'Number of Deals',
+                data: {{ deals_by_stage.values|safe }},
+                backgroundColor: ['#6c757d', '#0dcaf0', '#0d6efd', '#ffc107', '#198754', '#dc3545']
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+    });
+
+    // Contact Status Pie Chart
+    const contactsCtx = document.getElementById('contactsChart').getContext('2d');
+    new Chart(contactsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ contact_status.keys|safe }},
+            datasets: [{
+                data: {{ contact_status.values|safe }},
+                backgroundColor: ['#ffc107', '#198754', '#6f42c1']
+            }]
+        }
+    });
+
+    // Revenue Line Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Revenue (Rs)',
+                data: [15000, 25000, 18000, 32000, 28000, {{ total_revenue }}],
+                borderColor: '#198754',
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(25, 135, 84, 0.1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
+{% endblock %}

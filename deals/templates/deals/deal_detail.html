@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ deal.title }} - CRM{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between {% if deal.stage == 'won' %}bg-success{% elif deal.stage == 'lost' %}bg-danger{% else %}bg-primary{% endif %} text-white">
+        <h4 class="mb-0"><i class="fas fa-handshake"></i> {{ deal.title }}</h4>
+        <div>
+            <a href="{% url 'deal_update' deal.pk %}" class="btn btn-light btn-sm"><i class="fas fa-edit"></i> Edit</a>
+            <a href="{% url 'deal_list' %}" class="btn btn-light btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Value:</strong> <span class="fs-4 text-success">Rs. {{ deal.value }}</span></p>
+                <p><strong>Stage:</strong> 
+                    {% if deal.stage == 'won' %}<span class="badge bg-success">Won</span>
+                    {% elif deal.stage == 'lost' %}<span class="badge bg-danger">Lost</span>
+                    {% else %}<span class="badge bg-primary">{{ deal.stage|title }}</span>{% endif %}
+                </p>
+                <p><strong>Contact:</strong> <a href="{% url 'contact_detail' deal.contact.pk %}">{{ deal.contact }}</a></p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Company:</strong> {{ deal.company|default:"-" }}</p>
+                <p><strong>Expected Close:</strong> {{ deal.expected_close_date|default:"-" }}</p>
+                <p><strong>Assigned To:</strong> {{ deal.assigned_to|default:"-" }}</p>
+            </div>
+        </div>
+        {% if deal.description %}
+        <hr>
+        <h6>Description:</h6>
+        <p class="text-muted">{{ deal.description|linebreaks }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
