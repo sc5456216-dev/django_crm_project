@@ -157,3 +157,11 @@ MAILERS = {
 
 DEFAULT_FROM_EMAIL = "sc5456216@gmail.com"
 SERVER_EMAIL = "sc5456216@gmail.com"
+
+# Celery Configuration (Fake Redis - no external server needed)
+CELERY_BROKER_URL = 'memory://'
+CELERY_RESULT_BACKEND = 'cache+memory://'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Kathmandu'

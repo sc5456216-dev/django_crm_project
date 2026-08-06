@@ -6,9 +6,11 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="fas fa-handshake text-primary"></i> Deals <span class="badge bg-secondary">{{ total }}</span></h2>
     <div>
-    <a href="{% url 'deal_pipeline' %}" class="btn btn-outline-primary"><i class="fas fa-columns"></i> Pipeline</a>
-    <a href="{% url 'deal_create' %}" class="btn btn-success"><i class="fas fa-plus"></i> Add Deal</a>
-</div>
+        <a href="{% url 'deal_pipeline' %}" class="btn btn-outline-primary"><i class="fas fa-columns"></i> Pipeline</a>
+        {% if is_manager %}
+            <a href="{% url 'deal_create' %}" class="btn btn-success"><i class="fas fa-plus"></i> Add Deal</a>
+        {% endif %}
+    </div>
 </div>
 
 <div class="card mb-4 shadow-sm">
@@ -38,8 +40,10 @@
                     <th>Value</th>
                     <th>Stage</th>
                     <th>Contact</th>
-                    <th>Expected Close</th>
-                    <th>Actions</th>
+                    <th>Assigned To</th>
+                    {% if is_manager %}
+                        <th>Actions</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -56,14 +60,18 @@
                         {% else %}<span class="badge bg-danger">Lost</span>{% endif %}
                     </td>
                     <td>{{ deal.contact }}</td>
-                    <td>{{ deal.expected_close_date|default:"-" }}</td>
+                    <td>{{ deal.assigned_to|default:"Unassigned" }}</td>
+                    {% if is_manager %}
                     <td>
                         <a href="{% url 'deal_update' deal.pk %}" class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></a>
-                        <a href="{% url 'deal_delete' deal.pk %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></a>
+                        {% if is_admin %}
+                            <a href="{% url 'deal_delete' deal.pk %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></a>
+                        {% endif %}
                     </td>
+                    {% endif %}
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" class="text-center text-muted py-4">No deals found. <a href="{% url 'deal_create' %}">Create one</a></td></tr>
+                <tr><td colspan="6" class="text-center text-muted py-4">No deals found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

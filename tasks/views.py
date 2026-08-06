@@ -1,56 +1,62 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.core.mail import send_mail
-from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from .models import Task
 from .forms import TaskForm
+from accounts.decorators import admin_required, manager_required
+from .tasks import send_task_email_async
 
 
 @login_required
 def task_list(request):
-    tasks = Task.objects.all()
+    if request.user.groups.filter(name='Sales Rep').exists():
+        tasks = Task.objects.filter(assigned_to=request.user)
+    else:
+        tasks = Task.objects.all()
+
     status = request.GET.get('status')
     if status:
         tasks = tasks.filter(status=status)
-    return render(request, 'tasks/task_list.html', {'tasks': tasks, 'total': tasks.count()})
+
+    return render(request, 'tasks/task_list.html', {
+        'tasks': tasks,
+        'total': tasks.count(),
+        'is_admin': request.user.groups.filter(name='Admin').exists(),
+        'is_manager': request.user.groups.filter(name__in=['Admin', 'Sales Manager']).exists(),
+    })
 
 
 @login_required
 def task_detail(request, pk):
     task = get_object_or_404(Task, pk=pk)
+
+    if request.user.groups.filter(name='Sales Rep').exists():
+        if task.assigned_to != request.user:
+            raise PermissionDenied("You can only view your assigned tasks.")
+
     return render(request, 'tasks/task_detail.html', {'task': task})
 
 
 @login_required
+@manager_required
 def task_create(request):
     if request.method == 'POST':
         form = TaskForm(request.POST)
         if form.is_valid():
             task = form.save()
-            
-            # Send email notification to assigned user
+
+            # Send email ASYNCHRONOUSLY via Celery
             if task.assigned_to and task.assigned_to.email:
-                send_mail(
-                    subject=f'New Task Assigned: {task.title}',
-                    message=f'''Hi {task.assigned_to.username},
-
-You have been assigned a new task in My CRM.
-
-Task: {task.title}
-Due Date: {task.due_date}
-Status: {task.get_status_display()}
-
-Notes: {task.notes or 'No notes'}
-
-Please complete it on time.
-- My CRM System''',
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[task.assigned_to.email],
-                    fail_silently=True,
+                send_task_email_async.delay(
+                    task_title=task.title,
+                    assigned_email=task.assigned_to.email,
+                    assigned_username=task.assigned_to.username,
+                    due_date=str(task.due_date),
+                    notes=task.notes or ''
                 )
-            
-            messages.success(request, 'Task created and email sent successfully!')
+
+            messages.success(request, 'Task created! Email will be sent shortly.')
             return redirect('task_list')
     else:
         form = TaskForm()
@@ -58,6 +64,7 @@ Please complete it on time.
 
 
 @login_required
+@manager_required
 def task_update(request, pk):
     task = get_object_or_404(Task, pk=pk)
     if request.method == 'POST':
@@ -72,6 +79,7 @@ def task_update(request, pk):
 
 
 @login_required
+@admin_required
 def task_delete(request, pk):
     task = get_object_or_404(Task, pk=pk)
     if request.method == 'POST':

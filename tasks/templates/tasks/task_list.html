@@ -5,7 +5,11 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="fas fa-tasks text-primary"></i> Tasks <span class="badge bg-secondary">{{ total }}</span></h2>
-    <a href="{% url 'task_create' %}" class="btn btn-success"><i class="fas fa-plus"></i> Add Task</a>
+    <div>
+        {% if is_manager %}
+            <a href="{% url 'task_create' %}" class="btn btn-success"><i class="fas fa-plus"></i> Add Task</a>
+        {% endif %}
+    </div>
 </div>
 
 <div class="card mb-4 shadow-sm">
@@ -33,7 +37,9 @@
                     <th>Due Date</th>
                     <th>Contact</th>
                     <th>Assigned To</th>
-                    <th>Actions</th>
+                    {% if is_manager %}
+                        <th>Actions</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -47,14 +53,18 @@
                     </td>
                     <td>{{ task.due_date|date:"Y-m-d H:i" }}</td>
                     <td>{{ task.contact|default:"-" }}</td>
-                    <td>{{ task.assigned_to }}</td>
+                    <td>{{ task.assigned_to|default:"Unassigned" }}</td>
+                    {% if is_manager %}
                     <td>
                         <a href="{% url 'task_update' task.pk %}" class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></a>
-                        <a href="{% url 'task_delete' task.pk %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></a>
+                        {% if is_admin %}
+                            <a href="{% url 'task_delete' task.pk %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></a>
+                        {% endif %}
                     </td>
+                    {% endif %}
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" class="text-center text-muted py-4">No tasks found. <a href="{% url 'task_create' %}">Create one</a></td></tr>
+                <tr><td colspan="6" class="text-center text-muted py-4">No tasks found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
