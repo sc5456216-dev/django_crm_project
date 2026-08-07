@@ -13,6 +13,8 @@ class Note(models.Model):
         on_delete=models.CASCADE
     )
 
+    title = models.CharField(max_length=200, blank=True, default='')
+
     contact = models.ForeignKey(
         Contact,
         on_delete=models.CASCADE,
@@ -55,4 +57,4 @@ class Note(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.author} - {self.created_at:%Y-%m-%d}"
+        return self.title or f"{self.author} - {self.created_at:%Y-%m-%d}"
