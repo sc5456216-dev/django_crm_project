@@ -8,7 +8,8 @@ from deals.models import Deal
 from tasks.models import Task
 from activities.models import ActivityLog
 from notes.models import Note
-from notes.forms import NoteForm   
+from notes.forms import NoteForm
+from portfolio.models import Project   
 
 
 @login_required
@@ -32,6 +33,9 @@ def dashboard(request):
 
     # Total notes
     total_notes = Note.objects.count()
+
+    # Recent projects 
+    recent_projects = Project.objects.order_by('-created_at')[:5]
 
     # Deals by stage
     deals_by_stage = {
@@ -65,7 +69,7 @@ def dashboard(request):
     else:
         recent_activities = ActivityLog.objects.select_related('user').order_by('-created_at')[:10]
 
-    # 👇 Instantiate the note form
+    # Instantiate the note form
     form = NoteForm()
 
     context = {
@@ -78,12 +82,12 @@ def dashboard(request):
         'recent_contacts': recent_contacts,
         'recent_notes': recent_notes,
         'total_notes': total_notes,
+        'recent_projects': recent_projects,   
         'deals_by_stage': deals_by_stage,
         'monthly_revenue': monthly_revenue,
         'contact_status': contact_status,
         'recent_activities': recent_activities,
-        'form': form,   
+        'form': form,
     }
-
 
     return render(request, 'dashboard/dashboard.html', context)

@@ -1,603 +1,247 @@
 {% extends "base.html" %}
 
-
 {% block title %}
 Dashboard - CRM
 {% endblock %}
 
-
-
 {% block content %}
-
 
 <div class="container mt-4">
 
+    <h2 class="mb-4">
+        <i class="fas fa-chart-line"></i>
+        Dashboard
+    </h2>
 
-<h2 class="mb-4">
-
-    <i class="fas fa-chart-line"></i>
-
-    Dashboard
-
-</h2>
-
-
-
-<!-- ================= Statistics Cards ================= -->
-
-
-<div class="row g-3">
-
-
-    <div class="col-md-3">
-
-        <div class="card shadow-sm bg-primary text-white">
-
-            <div class="card-body">
-
-
-                <h5>
-
-                    <i class="fas fa-users"></i>
-
-                    Contacts
-
-                </h5>
-
-
-                <h2>
-
-                    {{ total_contacts }}
-
-                </h2>
-
-
+    <!-- ================= Statistics Cards ================= -->
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <h5><i class="fas fa-users"></i> Contacts</h5>
+                    <h2>{{ total_contacts }}</h2>
+                </div>
             </div>
-
         </div>
-
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-info text-white">
+                <div class="card-body">
+                    <h5><i class="fas fa-handshake"></i> Total Deals</h5>
+                    <h2>{{ total_deals }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-success text-white">
+                <div class="card-body">
+                    <h5><i class="fas fa-trophy"></i> Won Deals</h5>
+                    <h2>{{ won_deals }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-warning">
+                <div class="card-body">
+                    <h5><i class="fas fa-tasks"></i> Pending Tasks</h5>
+                    <h2>{{ pending_tasks }}</h2>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <br>
 
-
-
-
-    <div class="col-md-3">
-
-
-        <div class="card shadow-sm bg-info text-white">
-
-
-            <div class="card-body">
-
-
-                <h5>
-
-                    <i class="fas fa-handshake"></i>
-
-                    Total Deals
-
-                </h5>
-
-
-                <h2>
-
-                    {{ total_deals }}
-
-                </h2>
-
-
+    <!-- ================= Charts ================= -->
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <i class="fas fa-chart-bar"></i> Deals by Stage
+                </div>
+                <div class="card-body">
+                    <canvas id="dealChart"></canvas>
+                </div>
             </div>
-
-
         </div>
-
-
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <i class="fas fa-chart-pie"></i> Contact Status
+                </div>
+                <div class="card-body">
+                    <canvas id="contactChart"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <br>
 
-
-
-
-
-
-    <div class="col-md-3">
-
-
-        <div class="card shadow-sm bg-success text-white">
-
-
-            <div class="card-body">
-
-
-                <h5>
-
-                    <i class="fas fa-trophy"></i>
-
-                    Won Deals
-
-                </h5>
-
-
-                <h2>
-
-                    {{ won_deals }}
-
-                </h2>
-
-
-            </div>
-
-
+    <!-- ================= Revenue ================= -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-money-bill"></i>
+                Total Revenue: Rs. {{ total_revenue }}
+            </h5>
         </div>
-
-
     </div>
 
+    <br>
 
-
-
-
-
-
-    <div class="col-md-3">
-
-
-        <div class="card shadow-sm bg-warning">
-
-
-            <div class="card-body">
-
-
-                <h5>
-
-                    <i class="fas fa-tasks"></i>
-
-                    Pending Tasks
-
-                </h5>
-
-
-                <h2>
-
-                    {{ pending_tasks }}
-
-                </h2>
-
-
-            </div>
-
-
+    <!-- ================= Recent Contacts ================= -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-user-plus"></i> Recently Added Contacts
+            </h5>
         </div>
-
-
+        <div class="list-group list-group-flush">
+            {% for contact in recent_contacts %}
+                <a href="{% url 'contact_detail' contact.pk %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between">
+                        <span><i class="fas fa-user"></i> {{ contact.full_name }}</span>
+                        <small>{{ contact.created_at|date:"Y-m-d" }}</small>
+                    </div>
+                </a>
+            {% empty %}
+                <div class="p-3 text-center">No contacts found.</div>
+            {% endfor %}
+        </div>
     </div>
 
+    <br>
+
+    <!-- ================= Recent Notes ================= -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-sticky-note"></i> Recent Notes
+                <span class="badge bg-light text-dark float-end">Total: {{ total_notes }}</span>
+            </h5>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for note in recent_notes %}
+                <a href="{% url 'note_update' note.pk %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between">
+                        <span>
+                            <i class="fas fa-file-alt"></i>
+                            {{ note.title|default:note.content|truncatechars:30 }}
+                        </span>
+                        <small>{{ note.created_at|date:"Y-m-d H:i" }}</small>
+                    </div>
+                    <div class="text-muted small">{{ note.content|truncatechars:60 }}</div>
+                </a>
+            {% empty %}
+                <div class="p-3 text-center">
+                    No notes yet.
+                    <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#quickNoteForm">
+                        <i class="fas fa-plus"></i> Add a note
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="card-footer bg-transparent">
+            <a href="{% url 'note_list' %}" class="btn btn-outline-info btn-sm">
+                View All Notes <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- ================= Quick Add Note Form ================= -->
+    <div class="card shadow-sm mt-3 collapse {% if not recent_notes %}show{% endif %}" id="quickNoteForm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-pen"></i> Quick Add Note</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{% url 'dashboard_note_create' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#quickNoteForm">
+                    Cancel
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- ================= Recent Projects ================= -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-briefcase"></i> Recent Projects
+                <span class="badge bg-light text-dark float-end">{{ recent_projects|length }} Total</span>
+            </h5>
+        </div>
+        <div class="list-group list-group-flush">
+            {% for project in recent_projects %}
+                <a href="{% url 'portfolio_detail' project.slug %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-project-diagram"></i>
+                            {{ project.title }}
+                            {% if project.featured %}
+                                <span class="badge bg-warning text-dark ms-1">Featured</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <span class="badge bg-secondary">{{ project.category.name|default:"Uncategorized" }}</span>
+                            <small class="text-muted ms-2">{{ project.created_at|date:"Y-m-d" }}</small>
+                        </div>
+                    </div>
+                    <div class="text-muted small">{{ project.description|truncatechars:60 }}</div>
+                </a>
+            {% empty %}
+                <div class="p-3 text-center">
+                    No projects yet.
+                    <a href="{% url 'admin:portfolio_project_add' %}" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus"></i> Add a project
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="card-footer text-end">
+            <a href="{% url 'portfolio_list' %}" class="btn btn-outline-success btn-sm">
+                View All Projects <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- ================= Activity Timeline ================= -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                <i class="fas fa-history text-primary"></i> Activity Timeline
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if recent_activities %}
+                <div class="timeline">
+                    {% for activity in recent_activities %}
+                        <div class="timeline-item">
+                            <div class="timeline-icon"><i class="fas fa-check"></i></div>
+                            <div class="timeline-content">
+                                <h6>{{ activity.action }}</h6>
+                                <p class="mb-1">{{ activity.description }}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-user"></i> {{ activity.user.username }}
+                                    &nbsp;|&nbsp;
+                                    <i class="fas fa-clock"></i> {{ activity.created_at|timesince }} ago
+                                </small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">No activities found.</div>
+            {% endif %}
+        </div>
+    </div>
 
 </div>
-
-
-
-
-
-<br>
-
-
-
-
-
-<!-- ================= Charts ================= -->
-
-
-
-<div class="row g-3">
-
-
-
-<div class="col-md-6">
-
-
-<div class="card shadow-sm">
-
-
-<div class="card-header bg-dark text-white">
-
-
-<i class="fas fa-chart-bar"></i>
-
-Deals by Stage
-
-
-</div>
-
-
-
-<div class="card-body">
-
-
-<canvas id="dealChart"></canvas>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-<div class="col-md-6">
-
-
-<div class="card shadow-sm">
-
-
-<div class="card-header bg-dark text-white">
-
-
-<i class="fas fa-chart-pie"></i>
-
-Contact Status
-
-
-</div>
-
-
-
-
-<div class="card-body">
-
-
-<canvas id="contactChart"></canvas>
-
-
-</div>
-
-
-
-</div>
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-<br>
-
-
-
-
-
-<!-- ================= Revenue ================= -->
-
-
-
-<div class="card shadow-sm">
-
-
-<div class="card-header bg-success text-white">
-
-
-<h5 class="mb-0">
-
-
-<i class="fas fa-money-bill"></i>
-
-
-Total Revenue:
-
-Rs. {{ total_revenue }}
-
-
-</h5>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-<br>
-
-
-
-
-
-<!-- ================= Recent Contacts ================= -->
-
-
-
-<div class="card shadow-sm">
-
-
-
-<div class="card-header bg-secondary text-white">
-
-
-<h5 class="mb-0">
-
-
-<i class="fas fa-user-plus"></i>
-
-
-Recently Added Contacts
-
-
-</h5>
-
-
-</div>
-
-
-
-
-
-<div class="list-group list-group-flush">
-
-
-
-{% for contact in recent_contacts %}
-
-
-
-<a href="{% url 'contact_detail' contact.pk %}"
-
-class="list-group-item list-group-item-action">
-
-
-
-<div class="d-flex justify-content-between">
-
-
-
-<span>
-
-
-<i class="fas fa-user"></i>
-
-
-{{ contact.full_name }}
-
-
-</span>
-
-
-
-
-
-<small>
-
-
-{{ contact.created_at|date:"Y-m-d" }}
-
-
-</small>
-
-
-
-</div>
-
-
-
-</a>
-
-
-
-
-{% empty %}
-
-
-
-<div class="p-3 text-center">
-
-
-No contacts found.
-
-
-</div>
-
-
-
-{% endfor %}
-
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-<br>
-
-
-
-
-
-<!-- ================= Activity Timeline ================= -->
-
-
-
-<div class="card shadow-sm">
-
-
-
-<div class="card-header bg-white">
-
-
-<h5 class="mb-0">
-
-
-<i class="fas fa-history text-primary"></i>
-
-
-Activity Timeline
-
-
-</h5>
-
-
-</div>
-
-
-
-
-
-
-
-<div class="card-body">
-
-
-
-{% if recent_activities %}
-
-
-
-<div class="timeline">
-
-
-
-{% for activity in recent_activities %}
-
-
-
-<div class="timeline-item">
-
-
-
-<div class="timeline-icon">
-
-
-<i class="fas fa-check"></i>
-
-
-</div>
-
-
-
-
-
-<div class="timeline-content">
-
-
-
-<h6>
-
-
-{{ activity.action }}
-
-
-</h6>
-
-
-
-
-
-<p class="mb-1">
-
-
-{{ activity.description }}
-
-
-</p>
-
-
-
-
-
-<small class="text-muted">
-
-
-<i class="fas fa-user"></i>
-
-
-{{ activity.user.username }}
-
-
-&nbsp; | &nbsp;
-
-
-<i class="fas fa-clock"></i>
-
-
-{{ activity.created_at|timesince }} ago
-
-
-</small>
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-{% endfor %}
-
-
-
-</div>
-
-
-
-
-{% else %}
-
-
-
-<div class="alert alert-info">
-
-
-No activities found.
-
-
-</div>
-
-
-
-{% endif %}
-
-
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-</div>
-
-
 
 {% endblock %}
