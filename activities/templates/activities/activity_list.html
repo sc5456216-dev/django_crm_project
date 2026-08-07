@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "base.html" %}
 
 {% block content %}
@@ -93,3 +94,43 @@
 </div>
 
 {% endblock %}
+=======
+﻿{% extends 'base.html' %}
+
+{% block title %}Activity Timeline{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="fas fa-history text-primary"></i> Activity Timeline</h2>
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white"><h5 class="mb-0">All Activities</h5></div>
+        <div class="card-body">
+            {% if activities %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr><th>User</th><th>Action</th><th>Description</th><th>Module</th><th>Time</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in activities %}
+                            <tr>
+                                <td><i class="fas fa-user-circle"></i> {{ activity.user.username }}</td>
+                                <td><span class="badge bg-info">{{ activity.action }}</span></td>
+                                <td>{{ activity.description|default:"—" }}</td>
+                                <td>{{ activity.module|default:"General" }}</td>
+                                <td><small class="text-muted">{{ activity.created_at|date:"M d, Y H:i" }}<br><span class="text-muted">{{ activity.created_at|timesince }} ago</span></small></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted"><i class="fas fa-info-circle"></i> No activities recorded yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info"><i class="fas fa-info-circle"></i> No activities found.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+>>>>>>> samir
