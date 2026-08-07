@@ -1,0 +1,49 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}{{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'portfolio_list' %}">Portfolio</a></li>
+            <li class="breadcrumb-item active">{{ project.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <h2>{{ project.title }}</h2>
+            <p class="text-muted">Category: {{ project.category.name|default:"Uncategorized" }}</p>
+            {% if project.image %}
+                <img src="{{ project.image.url }}" class="img-fluid rounded mb-3" alt="{{ project.title }}">
+            {% endif %}
+            <p>{{ project.description|linebreaks }}</p>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Project Info</h5>
+                    <ul class="list-unstyled">
+                        {% if project.link %}
+                            <li><i class="fas fa-link"></i> <a href="{{ project.link }}" target="_blank">Live Demo</a></li>
+                        {% endif %}
+                        {% if project.github %}
+                            <li><i class="fab fa-github"></i> <a href="{{ project.github }}" target="_blank">GitHub</a></li>
+                        {% endif %}
+                        <li><i class="fas fa-calendar-alt"></i> Created: {{ project.created_at|date:"M d, Y" }}</li>
+                    </ul>
+                    <h6>Technologies</h6>
+                    <p>
+                        {% for tech in project.technologies.all %}
+                            <span class="badge bg-secondary">{{ tech.name }}</span>
+                        {% empty %}
+                            <span class="text-muted">None listed</span>
+                        {% endfor %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

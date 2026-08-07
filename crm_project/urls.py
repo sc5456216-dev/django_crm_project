@@ -1,4 +1,4 @@
-"""
+﻿"""
 URL configuration for crm_project project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -23,13 +23,18 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('portfolio/', include('portfolio.urls')),
     path('', include('dashboard.urls')),
     path('contacts/', include('contacts.urls')),
     path('companies/', include('companies.urls')),
     path('deals/', include('deals.urls')),
     path('tasks/', include('tasks.urls')),
     path('accounts/', include('accounts.urls')),
+    path('notes/', include('notes.urls')),
+    path('notifications/', include('notifications.urls')),
+    path('activities/', include('activities.urls')),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

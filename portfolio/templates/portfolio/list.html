@@ -1,0 +1,73 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Portfolio{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4"><i class="fas fa-briefcase"></i> My Portfolio</h2>
+
+    <!-- Skills -->
+    <div class="mb-4">
+        <h4>Skills</h4>
+        {% for skill in skills %}
+            <span class="badge bg-secondary me-1 mb-1" style="font-size: 1rem;">
+                {% if skill.icon %}<i class="{{ skill.icon }}"></i> {% endif %}
+                {{ skill.name }}
+                {% if skill.level == 3 %} ★★★
+                {% elif skill.level == 2 %} ★★
+                {% else %} ★
+                {% endif %}
+            </span>
+        {% endfor %}
+    </div>
+
+    <!-- Featured Projects -->
+    {% if featured %}
+    <div class="row mb-4">
+        <h4>Featured Projects</h4>
+        {% for project in featured %}
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100 shadow-sm">
+                    {% if project.image %}
+                        <img src="{{ project.image.url }}" class="card-img-top" alt="{{ project.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ project.title }}</h5>
+                        <p class="card-text text-muted">{{ project.description|truncatechars:100 }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{% url 'portfolio_detail' project.slug %}" class="btn btn-primary btn-sm">View</a>
+                        {% if project.link %}
+                            <a href="{{ project.link }}" target="_blank" class="btn btn-outline-secondary btn-sm">Live</a>
+                        {% endif %}
+                        {% if project.github %}
+                            <a href="{{ project.github }}" target="_blank" class="btn btn-outline-dark btn-sm">GitHub</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- All Projects -->
+    <h4>All Projects</h4>
+    <div class="row">
+        {% for project in projects %}
+            <div class="col-md-4 col-lg-3 mb-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-title">{{ project.title }}</h6>
+                        <p class="card-text small text-muted">{{ project.description|truncatechars:60 }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{% url 'portfolio_detail' project.slug %}" class="btn btn-outline-primary btn-sm">Details</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No projects yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

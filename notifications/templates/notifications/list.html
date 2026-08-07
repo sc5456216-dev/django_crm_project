@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}
+Notifications
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2>
+            <i class="fas fa-bell text-warning"></i>
+            Notifications
+        </h2>
+
+        <span class="badge bg-primary fs-6">
+            {{ notifications.count }} Total
+        </span>
+
+    </div>
+
+    {% if notifications %}
+
+        {% for notification in notifications %}
+
+        <div class="card shadow-sm mb-3 {% if not notification.is_read %}border-primary{% endif %}">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <h5>
+
+                            {{ notification.title }}
+
+                            {% if not notification.is_read %}
+                                <span class="badge bg-danger">New</span>
+                            {% endif %}
+
+                        </h5>
+
+                        <p class="mb-1">
+                            {{ notification.message }}
+                        </p>
+
+                        <small class="text-muted">
+                            {{ notification.created_at|date:"M d, Y H:i" }}
+                        </small>
+
+                    </div>
+
+                    <div>
+
+                        {% if not notification.is_read %}
+
+                        <a href="{% url 'mark_notification' notification.pk %}"
+                           class="btn btn-success btn-sm">
+
+                            <i class="fas fa-check"></i>
+                            Mark Read
+
+                        </a>
+
+                        {% endif %}
+
+                        <a href="{% url 'delete_notification' notification.pk %}"
+                           class="btn btn-danger btn-sm">
+
+                            <i class="fas fa-trash"></i>
+                            Delete
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="alert alert-info">
+
+            <i class="fas fa-info-circle"></i>
+
+            No notifications found.
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
