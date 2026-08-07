@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if form.instance.pk %}
+Edit Note
+{% else %}
+Add Note
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-8">
+
+        <div class="card shadow">
+
+            <div class="card-header bg-primary text-white">
+
+                <h4 class="mb-0">
+
+                    {% if form.instance.pk %}
+
+                        <i class="fas fa-edit"></i>
+                        Edit Note
+
+                    {% else %}
+
+                        <i class="fas fa-plus-circle"></i>
+                        Add Note
+
+                    {% endif %}
+
+                </h4>
+
+            </div>
+
+            <div class="card-body">
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+                    {{ form.as_p }}
+
+                    <button class="btn btn-success">
+
+                        <i class="fas fa-save"></i>
+
+                        Save
+
+                    </button>
+
+                    <a href="{% url 'note_list' %}"
+                       class="btn btn-secondary">
+
+                        Cancel
+
+                    </a>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

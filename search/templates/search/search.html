@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Search Results
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+
+    <i class="fas fa-search text-primary"></i>
+
+    Search Results
+
+</h2>
+
+{% if query %}
+
+<div class="alert alert-info">
+
+    Showing results for
+
+    <strong>"{{ query }}"</strong>
+
+</div>
+
+{% endif %}
+
+
+<!-- Contacts -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-primary text-white">
+
+        <h5 class="mb-0">
+
+            Contacts ({{ contacts.count }})
+
+        </h5>
+
+    </div>
+
+    <div class="list-group list-group-flush">
+
+        {% for contact in contacts %}
+
+        <a href="{% url 'contact_detail' contact.pk %}"
+
+           class="list-group-item list-group-item-action">
+
+            <i class="fas fa-user text-primary"></i>
+
+            {{ contact.full_name }}
+
+            <small class="text-muted">
+
+                ({{ contact.email }})
+
+            </small>
+
+        </a>
+
+        {% empty %}
+
+        <div class="list-group-item text-muted">
+
+            No contacts found.
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+<!-- Companies -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-success text-white">
+
+        <h5 class="mb-0">
+
+            Companies ({{ companies.count }})
+
+        </h5>
+
+    </div>
+
+    <div class="list-group list-group-flush">
+
+        {% for company in companies %}
+
+        <a href="{% url 'company_detail' company.pk %}"
+
+           class="list-group-item list-group-item-action">
+
+            <i class="fas fa-building text-success"></i>
+
+            {{ company.name }}
+
+        </a>
+
+        {% empty %}
+
+        <div class="list-group-item text-muted">
+
+            No companies found.
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+<!-- Deals -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-warning">
+
+        <h5 class="mb-0">
+
+            Deals ({{ deals.count }})
+
+        </h5>
+
+    </div>
+
+    <div class="list-group list-group-flush">
+
+        {% for deal in deals %}
+
+        <a href="{% url 'deal_detail' deal.pk %}"
+
+           class="list-group-item list-group-item-action">
+
+            <i class="fas fa-handshake text-warning"></i>
+
+            {{ deal.title }}
+
+        </a>
+
+        {% empty %}
+
+        <div class="list-group-item text-muted">
+
+            No deals found.
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+<!-- Tasks -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-info text-white">
+
+        <h5 class="mb-0">
+
+            Tasks ({{ tasks.count }})
+
+        </h5>
+
+    </div>
+
+    <div class="list-group list-group-flush">
+
+        {% for task in tasks %}
+
+        <a href="{% url 'task_detail' task.pk %}"
+
+           class="list-group-item list-group-item-action">
+
+            <i class="fas fa-tasks text-info"></i>
+
+            {{ task.title }}
+
+        </a>
+
+        {% empty %}
+
+        <div class="list-group-item text-muted">
+
+            No tasks found.
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">
+        Activity Timeline
+    </h2>
+
+    <div class="card shadow">
+
+        <div class="card-body">
+
+            {% if activities %}
+
+                <table class="table table-hover">
+
+                    <thead>
+
+                        <tr>
+                            <th>User</th>
+                            <th>Module</th>
+                            <th>Action</th>
+                            <th>Object</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {% for activity in activities %}
+
+                        <tr>
+
+                            <td>{{ activity.user.username }}</td>
+
+                            <td>
+                                <span class="badge bg-primary">
+                                    {{ activity.module }}
+                                </span>
+                            </td>
+
+                            <td>
+
+                                {% if activity.action == "CREATE" %}
+                                    <span class="badge bg-success">
+                                        {{ activity.action }}
+                                    </span>
+
+                                {% elif activity.action == "UPDATE" %}
+                                    <span class="badge bg-warning text-dark">
+                                        {{ activity.action }}
+                                    </span>
+
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        {{ activity.action }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>{{ activity.object_name }}</td>
+
+                            <td>{{ activity.description }}</td>
+
+                            <td>{{ activity.created_at|date:"M d, Y H:i" }}</td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            {% else %}
+
+                <div class="alert alert-info">
+                    No activities found.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
