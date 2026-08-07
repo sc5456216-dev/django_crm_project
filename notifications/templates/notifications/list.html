@@ -57,7 +57,7 @@ Notifications
 
                         {% if not notification.is_read %}
 
-                        <a href="{% url 'mark_notification' notification.pk %}"
+                        <a href="{% url 'notifications:mark_notification' notification.pk %}"
                            class="btn btn-success btn-sm">
 
                             <i class="fas fa-check"></i>
@@ -67,7 +67,7 @@ Notifications
 
                         {% endif %}
 
-                        <a href="{% url 'delete_notification' notification.pk %}"
+                        <a href="{% url 'notifications:delete_notification' notification.pk %}"
                            class="btn btn-danger btn-sm">
 
                             <i class="fas fa-trash"></i>
